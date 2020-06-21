@@ -65,6 +65,6 @@ for chunk in to_be_searched:
 #     str_list[i].append(res[order])
 #     order += 1
 
-f = io.open("E:/out.txt", "w")
+f = io.open("out.txt", "w")
 f.write(json.dumps(str_list))
 f.close()
