@@ -1,6 +1,40 @@
-import json, io, random
+import json, io, random, os
+
+statistics = {
+    "random_test": {
+        "incorrect": {},
+        "correct": {}
+    },
+    "multiple_choice_wd": {
+        "incorrect": {},
+        "correct": {}
+    },
+    "multiple_choice_dw": {
+        "incorrect": {},
+        "correct": {}
+    }
+}
+if os.path.isfile("statistics.json"):
+    statistics = json.loads(io.open("statistics.json", "r").read())
+
 f = io.open("word_dict_cet4.json", "r")
 word_dict = json.loads(f.read())
+
+def quit():
+    statistics_f = io.open("statistics.json", "w")
+    statistics_f.write(json.dumps(statistics))
+    statistics_f.close()
+    exit()
+
+def print_statistics():
+    for k, v in statistics.items():
+        print(k + ": ")
+        print("\tIncorrect: ")
+        for w, t in v["incorrect"].items():
+            print("\t\t" + w.ljust(10) + ": " + t + " time(s)")
+        print("\tCorrect: ")
+        for w, t in v["correct"].items():
+            print("\t\t" + w.ljust(10) + ": " + t + " time(s)")
 
 def random_word():
     return random.choice(list(word_dict.keys()))
@@ -55,7 +89,8 @@ operations = {
     "N" : ("Normal test", random_test),
     "M" : ("Multiple choice(definition->words)", multiple_choice_test_agent(False)),
     "IM": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
-    "Q" : ("Quit", lambda: exit())
+    "S" : ("Statistics", print_statistics),
+    "Q" : ("Quit", quit)
 }
 
 
