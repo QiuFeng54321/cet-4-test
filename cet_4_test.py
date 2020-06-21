@@ -5,37 +5,71 @@ word_dict = json.loads(f.read())
 def random_word():
     return random.choice(list(word_dict.keys()))
 
+def random_words(k):
+    return random.sample(list(word_dict.keys()), k)
+
 def random_test():
     while True:
         word = random_word()
         definition = word_dict[word]
         ans = input(word + ": ")
-        print(word, ":", definition)
+        print(word, ":", pretty_def(definition, pretty_example = True))
         if ans == "q":
             return None
+def print_separation():
+    print()
+    print('---------------------------------------')
+    print()
 
-def multiple_choice_test():
+def pretty_def(definition, show_example: bool = True, pretty_example: bool = True):
+    if show_example:
+        if pretty_example:
+            return "\nExample: ".join(definition.split(":"))
+        return definition
+    return definition.split(":")[0]
+
+def multiple_choice_test_agent(inverse: bool = False):
+    def agent():
+        while True:
+            print_separation()
+            confusing_words = random_words(4)
+            correct_answer = random.randint(0, 3)
+            correct_word = confusing_words[correct_answer]
+            correct_definition = word_dict[correct_word]
+            print(correct_word if inverse else pretty_def(correct_definition, False))
+            for i in range(4):
+                print(i + 1, pretty_def(word_dict[confusing_words[i]], show_example = False) if inverse else confusing_words[i])
+            answer = input('What do you choose [1-4]')
+            if answer == "q":
+                break
+            if answer.isdigit():
+                answer = int(answer)
+                if answer - 1 == correct_answer:
+                    print("Correct!")
+                else:
+                    print("No!")
+            print(correct_word, ":", pretty_def(correct_definition))
+    return agent
+
+operations = {
+    "N" : ("Normal test", random_test),
+    "M" : ("Multiple choice(definition->words)", multiple_choice_test_agent(False)),
+    "IM": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
+    "Q" : ("Quit", lambda: exit())
+}
+
+
+def main():
     while True:
-        print()
-        print("-------------------------------------------")
-        print()
-        confusing_words = [random_word() for i in range(4)]
-        correct_answer = random.randint(0, 3)
-        correct_word = confusing_words[correct_answer]
-        correct_definition = word_dict[correct_word]
-        print(correct_definition.split(':')[0]) # We don't want the example sentence with the correct word along.
-        for i in range(4):
-            print(i + 1, ":", confusing_words[i])
-        answer = input("What do you choose [1-4]: ")
-        if answer == "q":
-            break
-        if answer.isdigit():
-            answer = int(answer)
-            if answer - 1 == correct_answer:
-                print("Correct!")
-            else:
-                print("No!")
-        print(correct_word, ":", correct_definition)
+        print("Tests to take:")
+        for k,v in operations.items():
+            print(f"[{k.ljust(3)}]: {v[0]}")
+        operation = input("What type of test do you want to take?")
+        operation = operation.upper()
+        if not operation in operations.keys():
+            print("Not an option.")
+            continue
+        operation = operations[operation][1]
+        operation()
 
-
-multiple_choice_test()
+main()
