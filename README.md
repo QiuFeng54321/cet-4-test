@@ -4,16 +4,26 @@ However you can add a new vocab database by creating (`word_dict_{name}.json`).
 Syntax: `{'word': ['definition', 'example'], ...}`
 
 ## Run
+
 Run `quiz.py`
 
-## Definition gatherer
-A simple program to gather definition from [here](http://dictionary.reference.com/)
+## How to use
 
-## Tokenizer
+### Main instruction
 
-Tokenizes vocabularies from a txt and gathers definition from [here](http://dictionary.reference.com/)  
-and then output it to `out.txt`
+When run, the first thing you need to do is to input the index of a word dict.  
+After selecting, the vocab dict will be loaded and you will be redirected to  
+main instruction.  
+Type a command to continue.  
+E.g.: type mc to go to multiple choice.  
+You can answer a multiple choice question by typing a number (1-4) and press `<Enter>`  
+You can always quit by typing `q` and type `<Enter>`.  
+Instructions:
++ NT : normal test
++ MC : multiple choice (definition -> word)
++ IMC: inverse multiple choice (word -> definition)
++ CWL: reselect word dict
++ LW : lookup word
++ S  : view statistics (how many correct or incorrect answers you have done in each section)
++ Q  : quit the program
 
-## Clear null
-
-Clears null and output `word_dict_cet4.json`
