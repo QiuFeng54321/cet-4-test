@@ -165,7 +165,7 @@ operations = {
     "IMC": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
     "LW" : ("Lookup words", lookup_words),
     "S"  : ("Statistics", print_statistics),
-    "CWL": ("Change word list", change_word_dict), 
+    "RWD": ("Reselect word dict", change_word_dict), 
     "Q"  : ("Quit", quit)
 }
 

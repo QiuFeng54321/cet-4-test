@@ -22,7 +22,7 @@ Instructions:
 + NT : normal test
 + MC : multiple choice (definition -> word)
 + IMC: inverse multiple choice (word -> definition)
-+ CWL: reselect word dict
++ RWD: reselect word dict
 + LW : lookup word
 + S  : view statistics (how many correct or incorrect answers you have done in each section)
 + Q  : quit the program
