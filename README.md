@@ -4,7 +4,7 @@ However you can change the database data (`word_dict_cet4.json`) to whatever voc
 you want to be tested on.  
 
 ## Run
-Just run `cet_4_test.py`
+Run `quiz.py`
 
 ## Definition gatherer
 A simple program to gather definition from [here](http://dictionary.reference.com/)
@@ -13,6 +13,7 @@ A simple program to gather definition from [here](http://dictionary.reference.co
 
 Tokenizes vocabularies from a txt and gathers definition from [here](http://dictionary.reference.com/)  
 and then output it to `out.txt`
+
 ## Clear null
 
 Clears null and output `word_dict_cet4.json`

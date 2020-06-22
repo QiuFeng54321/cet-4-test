@@ -1,4 +1,4 @@
-import json, io, random, os, re
+import json, io, random, os, re, sys
 import difflib
 import requests
 
@@ -16,11 +16,20 @@ statistics = {
         "correct": {}
     }
 }
+
+word_dict: dict = None
+def change_word_dict():
+    global word_dict
+    word_dicts: list = list(filter(lambda x: x.startswith("word_dict_"), os.listdir()))
+    for i in range(len(word_dicts)):
+        print("[" + str(i + 1) + "]" + ": " + word_dicts[i])
+    selection = input("Which word dictionary do you want to choose? [1-" + str(len(word_dicts)) + "/any[default=0]]: ")
+    selection = int(selection) - 1 if selection.isdigit() else 0
+    print("Chose " + word_dicts[selection])
+    word_dict = json.loads(io.open(word_dicts[selection], "r").read())
+
 if os.path.isfile("statistics.json"):
     statistics = json.loads(io.open("statistics.json", "r").read())
-
-f = io.open("word_dict_cet4.json", "r")
-word_dict: dict = json.loads(f.read())
 
 def get_exact_words(input_str):
     exact_words = difflib.get_close_matches(input_str, word_dict.keys())
@@ -40,7 +49,7 @@ def get_definition_from_internet(words: list, max_try_time: int = -1):
             print(e)
             print("Try again...")
             time_tried += 1
-            if time_tried > max_try_time and max_try_time != -1:
+            if time_tried >= max_try_time and max_try_time != -1:
                 print("Try time exceeded", max_try_time)
                 break
     return [None] * len(words)
@@ -56,10 +65,10 @@ def print_statistics():
         print(k + ": ")
         print("\tIncorrect: ")
         for w, t in v["incorrect"].items():
-            print("\t\t" + w.ljust(10) + ": " + str(t) + " time(s)")
+            print("\t\t" + w.ljust(20) + ": " + str(t) + " time(s)")
         print("\tCorrect: ")
         for w, t in v["correct"].items():
-            print("\t\t" + w.ljust(10) + ": " + str(t) + " time(s)")
+            print("\t\t" + w.ljust(20) + ": " + str(t) + " time(s)")
 
 def random_word():
     return random.choice(list(word_dict.keys()))
@@ -83,13 +92,12 @@ def print_separation():
 replace_def = re.compile("\w+? definition, ")
 def pretty_def(definition, show_example: bool = True, pretty_example: bool = True):
     import copy
-    new_def: str = copy.copy(definition)
-    new_def = replace_def.sub("", new_def, 1)
+    new_def: list = copy.copy(definition)
+    new_def[0] = replace_def.sub("", new_def[0], 1)
     if show_example:
         if pretty_example:
-            return "\nExample: ".join(new_def.split(":"))
-        return new_def
-    return new_def.split(":")[0]
+            return new_def[0] + "\nExample: " + new_def[1]
+    return new_def[0]
 
 def multiple_choice_test_agent(inverse: bool = False):
     statistic_name = "multiple_choice_" + ("wd" if inverse else "dw")
@@ -120,7 +128,7 @@ def multiple_choice_test_agent(inverse: bool = False):
 def lookup_words():
     while True:
         print_separation()
-        word = input("Type a word or quit[word/q]: ")
+        word = input("Type a word or quit[word/q]: ").lower()
         if word.lower() == "q":
             break
         found = get_exact_words(word)
@@ -128,35 +136,42 @@ def lookup_words():
             print("Vocab not in word dictionary...")
         print("Requested / Similar word(s):", ", ".join(found))
         print()
+        exact_word_found: bool = False
         for w in found:
-            if w == word:
+            if w.lower() == word:
                 print("Exact word found: ")
+                exact_word_found = True
             else:
                 print("Similar word: ")
             print(w, ":", pretty_def(word_dict[w]))
             print()
-        if word not in found:
+        if not exact_word_found:
             print("The exact word you want to find does not exist in the word dictionary.")
-            lookup = input("Do you want to loop it up from the Internet? [any/y]: ")
+            lookup = input("Do you want to look it up from the Internet? [any/y]: ")
             if lookup != "y":
                 continue
             definitions = get_definition_from_internet([word], 5)
             if definitions[0] == None:
                 print("Sorry. The definition also does not exist in dictionary.reference.com.....")
                 continue
-            print(word, ":", pretty_def(definitions[0]))
+            definition: list = definitions[0].split(": ")
+            if len(definition) < 2:
+                definition.append("")
+            print(word, ":", pretty_def(definition))
 
 operations = {
-    "N" : ("Normal test", random_test),
-    "M" : ("Multiple choice(definition->words)", multiple_choice_test_agent(False)),
-    "IM": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
-    "L" : ("Lookup words", lookup_words),
-    "S" : ("Statistics", print_statistics),
-    "Q" : ("Quit", quit)
+    "NT" : ("Normal test", random_test),
+    "MC" : ("Multiple choice(definition->words)", multiple_choice_test_agent(False)),
+    "IMC": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
+    "LW" : ("Lookup words", lookup_words),
+    "S"  : ("Statistics", print_statistics),
+    "CWL": ("Change word list", change_word_dict), 
+    "Q"  : ("Quit", quit)
 }
 
 
 def main():
+    change_word_dict()
     while True:
         print("Tests to take:")
         for k,v in operations.items():
