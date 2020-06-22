@@ -17,9 +17,11 @@ statistics = {
     }
 }
 
+selection: int = 0
 word_dict: dict = None
+word_dicts: list = list(filter(lambda x: x.startswith("word_dict_"), os.listdir()))
 def change_word_dict():
-    global word_dict
+    global word_dict, selection
     word_dicts: list = list(filter(lambda x: x.startswith("word_dict_"), os.listdir()))
     for i in range(len(word_dicts)):
         print("[" + str(i + 1) + "]" + ": " + word_dicts[i])
@@ -59,6 +61,10 @@ def quit():
     statistics_f.write(json.dumps(statistics))
     statistics_f.close()
     exit()
+
+def current_word_dict():
+    print("Current word dict: " + word_dicts[selection])
+    print("Word amound: " + str(len(word_dict.keys())))
 
 def print_statistics():
     for k, v in statistics.items():
@@ -165,7 +171,8 @@ operations = {
     "IMC": ("Multiple choice(word->definitions)", multiple_choice_test_agent(True)),
     "LW" : ("Lookup words", lookup_words),
     "S"  : ("Statistics", print_statistics),
-    "RWD": ("Reselect word dict", change_word_dict), 
+    "RWD": ("Reselect word dict", change_word_dict),
+    "CWD": ("Current word dict", current_word_dict),
     "Q"  : ("Quit", quit)
 }
 
